@@ -1,11 +1,11 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import CategoriaContext from './CategoriaContext';
 import Alerta from '../../comuns/Alerta';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
-import {  Col } from 'react-bootstrap';
+import { Col } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 
@@ -13,12 +13,28 @@ function Formulario() {
     const { objeto, handleChange, acaoCadastrar,
         alerta, exibirForm, setExibirForm } = useContext(CategoriaContext);
 
+    const [validated, setValidated] = useState(false);
+
+    const handleSubmit = (event) => {
+        const form = event.currentTarget;
+        if (form.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        setValidated(true);
+        if (form.checkValidity() === true) {
+            acaoCadastrar(event);
+        }
+    };
+
     return (
         <Modal show={exibirForm} onHide={() => setExibirForm(false)}>
             <Modal.Header closeButton>
                 <Modal.Title>Categorias</Modal.Title>
             </Modal.Header>
-            <form id='formulario' onSubmit={acaoCadastrar}>
+            <Form id='formulario' onSubmit={handleSubmit} noValidate
+                validated={validated}>
                 <Modal.Body>
                     <Container>
                         <Row>
@@ -40,6 +56,12 @@ function Formulario() {
                                         name="nome" value={objeto.nome}
                                         onChange={handleChange}
                                         placeholder="Informe o nome" />
+                                        <Form.Control.Feedback type='invalid'>
+                                            Informe o Nome
+                                        </Form.Control.Feedback>
+                                        <Form.Control.Feedback >
+                                            Campo Nome OK
+                                        </Form.Control.Feedback>                                        
                                 </FloatingLabel>
                             </Col>
                         </Row>
@@ -54,7 +76,7 @@ function Formulario() {
                         Salvar <i className='bi bi-save'></i>
                     </Button>
                 </Modal.Footer>
-            </form>
+            </Form>
         </Modal>
     )
 
