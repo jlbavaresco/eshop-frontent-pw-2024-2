@@ -71,6 +71,8 @@ function registerValidSW(swUrl, config) {
                 'New content is available and will be used when all ' +
                   'tabs for this page are closed. See https://cra.link/PWA.'
               );
+              alert(`Nova versão da APP disponível! 
+                Feche todas as abas e acesse novamente!`)
 
               // Execute callback
               if (config && config.onUpdate) {
