@@ -1,28 +1,35 @@
 import { useState, useEffect } from "react";
 import ProdutoContext from "./ProdutoContext";
 import { getCategoriasAPI } from "../../../servicos/CategoriaServico";
-import { getProdutoPorCodigoAPI, getProdutosAPI, cadastraProdutoAPI, 
+import {
+    getProdutoPorCodigoAPI, getProdutosAPI, cadastraProdutoAPI,
     deleteProdutoPorCodigoAPI
- } from "../../../servicos/ProdutoServico";
+} from "../../../servicos/ProdutoServico";
 import Tabela from "./Tabela";
 import Formulario from "./Formulario";
 import Carregando from "../../comuns/Carregando";
+import WithAuth from "../../../seguranca/WithAuth";
+import { useNavigate } from "react-router-dom";
 
 function Produto() {
+
+    let navigate = useNavigate();
 
     const [alerta, setAlerta] = useState({ status: "", message: "" });
     const [listaObjetos, setListaObjetos] = useState([]);
     const [listaCategorias, setListaCategorias] = useState([]);
     const [editar, setEditar] = useState(false);
     const [exibirForm, setExibirForm] = useState(false);
-    const [objeto, setObjeto] = useState({ codigo: 0,
+    const [objeto, setObjeto] = useState({
+        codigo: 0,
         nome: "",
-        descricao : "",
-        quantidade_estoque : "",
-        valor : "",
-        ativo : "",
-        data_cadastro : new Date().toISOString().slice(0,10),
-        categoria : "" });
+        descricao: "",
+        quantidade_estoque: "",
+        valor: "",
+        ativo: "",
+        data_cadastro: new Date().toISOString().slice(0, 10),
+        categoria: ""
+    });
     const [carregando, setCarregando] = useState(false);
 
     const novoObjeto = () => {
@@ -31,21 +38,26 @@ function Produto() {
         setObjeto({
             codigo: 0,
             nome: "",
-            descricao : "",
-            quantidade_estoque : "",
-            valor : "",
-            ativo : "",
-            data_cadastro : new Date().toISOString().slice(0,10),
-            categoria : ""
+            descricao: "",
+            quantidade_estoque: "",
+            valor: "",
+            ativo: "",
+            data_cadastro: new Date().toISOString().slice(0, 10),
+            categoria: ""
         })
         setExibirForm(true);
     }
 
     const editarObjeto = async codigo => {
-        setObjeto(await getProdutoPorCodigoAPI(codigo));
-        setEditar(true);
-        setAlerta({ status: "", message: "" });
-        setExibirForm(true);
+        try {
+
+            setObjeto(await getProdutoPorCodigoAPI(codigo));
+            setEditar(true);
+            setAlerta({ status: "", message: "" });
+            setExibirForm(true);
+        } catch (err) {
+            navigate("/login", { replace: true });
+        }
     }
 
     const acaoCadastrar = async e => {
@@ -59,7 +71,7 @@ function Produto() {
                 setEditar(true);
             }
         } catch (err) {
-            console.log("Erro: " + err);
+            navigate("/login", { replace: true });
         }
         recuperaProdutos();
     }
@@ -71,23 +83,35 @@ function Produto() {
     }
 
     const recuperaCategorias = async () => {
-        setListaCategorias(await getCategoriasAPI());
+        try {
+            setListaCategorias(await getCategoriasAPI());
+        } catch (err) {
+            navigate("/login", { replace: true });
+        }
     }
 
     const recuperaProdutos = async () => {
-        setCarregando(true);
-        setListaObjetos(await getProdutosAPI());
-        setCarregando(false);
-    }    
+        try {
+            setCarregando(true);
+            setListaObjetos(await getProdutosAPI());
+            setCarregando(false);
+        } catch (err) {
+            navigate("/login", { replace: true });
+        }
+    }
 
     const remover = async codigo => {
         if (window.confirm('Deseja remover este objeto?')) {
-            let retornoAPI = await deleteProdutoPorCodigoAPI(codigo);
-            setAlerta({
-                status: retornoAPI.status,
-                message: retornoAPI.message
-            });
-            recuperaProdutos();
+            try {
+                let retornoAPI = await deleteProdutoPorCodigoAPI(codigo);
+                setAlerta({
+                    status: retornoAPI.status,
+                    message: retornoAPI.message
+                });
+                recuperaProdutos();
+            } catch (err) {
+                navigate("/login", { replace: true });
+            }
         }
     }
 
@@ -110,4 +134,4 @@ function Produto() {
     )
 }
 
-export default Produto;
+export default WithAuth(Produto);

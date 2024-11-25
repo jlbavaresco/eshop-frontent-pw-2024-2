@@ -1,10 +1,13 @@
+import { getToken } from "../seguranca/Autenticacao";
+
 export const getProdutosAPI = async () => {
     const response = await 
         fetch(`${process.env.REACT_APP_ENDERECO_API}/produto`,
             {
                 method : "GET",
                 headers : {
-                    "Content-Type" : "application/json"
+                    "Content-Type" : "application/json",
+                    "authorization" : getToken()
                 }
             }
         );
@@ -18,7 +21,8 @@ export const getProdutoPorCodigoAPI = async codigo => {
             {
                 method : "GET",
                 headers : {
-                    "Content-Type" : "application/json"
+                    "Content-Type" : "application/json",
+                    "authorization" : getToken()
                 }
             }
         );
@@ -32,7 +36,8 @@ export const deleteProdutoPorCodigoAPI = async codigo => {
             {
                 method : "DELETE",
                 headers : {
-                    "Content-Type" : "application/json"
+                    "Content-Type" : "application/json",
+                    "authorization" : getToken()
                 }
             }
         );
@@ -46,7 +51,8 @@ export const cadastraProdutoAPI = async (objeto, metodo) => {
             {
                 method : metodo,
                 headers : {
-                    "Content-Type" : "application/json"
+                    "Content-Type" : "application/json",
+                    "authorization" : getToken()
                 },
                 body : JSON.stringify(objeto)
             }
